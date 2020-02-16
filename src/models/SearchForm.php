@@ -22,7 +22,7 @@ class SearchForm extends Model
     {
         return [
             ['question', 'string', 'max' => 100],
-            ['question', 'required', 'message' => Yii::t('app', 'Enter words to search.')]
+            ['question', 'required', 'message' => Yii::t('app.floor12.searchpg', 'Enter words to search.')]
         ];
     }
 

@@ -2,12 +2,12 @@
 
 namespace floor12\searchpg\query;
 
+use floor12\searchpg\models\SearchResult;
 use Yii;
 use yii\db\ActiveQuery;
+use yii\db\Exception;
 
 /**
- * This is the ActiveQuery class for [[SearchResult]].
- *
  * @see SearchResult
  */
 class SearchResultQuery extends ActiveQuery
@@ -15,18 +15,32 @@ class SearchResultQuery extends ActiveQuery
     /**
      * @param string $question
      * @return SearchResultQuery
-     * @throws \yii\db\Exception
+     * @throws Exception
      */
     public function search(string $question)
+    {
+        $tsVectoredQuestion = $this->prepareTsVectoredQuestion($question);
+        if (empty($tsVectoredQuestion))
+            return $this->andWhere('1=0');
+
+        return $this->andWhere("tsvector @@ plainto_tsquery('{$tsVectoredQuestion}')");
+    }
+
+    /**
+     * @param string $question
+     * @return bool|string
+     * @throws Exception
+     */
+    protected function prepareTsVectoredQuestion(string $question)
     {
         $tsVectoredQuestion = Yii::$app->db
             ->createCommand("SELECT to_tsvector('russian','{$question}')")
             ->queryScalar();
-        if (preg_match_all("/'([^ ]+)'/", $tsVectoredQuestion, $matches)) {
-            $question = implode(' ', $matches[1]);
-            return $this->andWhere("tsvector @@ plainto_tsquery('{$question}')");
-        }
-        return $this->andWhere('1=0');
+
+        if (!preg_match_all("/'([^ ]+)'/", $tsVectoredQuestion, $matches))
+            return false;
+
+        return implode(' ', $matches[1]);
     }
 
     /**

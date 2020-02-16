@@ -4,7 +4,8 @@
  * @var $model SearchResult
  */
 
-use app\models\search\SearchResult;
+
+use floor12\searchpg\models\SearchResult;
 use yii\web\View;
 
 ?>

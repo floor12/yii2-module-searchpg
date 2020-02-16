@@ -1,5 +1,6 @@
 <?php
 
+use floor12\searchpg\enum\Language;
 use yii\db\Migration;
 
 /**
@@ -20,6 +21,7 @@ class m200215_192826_search_index extends Migration
             'indexed' => $this->integer()->notNull(),
             'updated' => $this->integer()->notNull(),
             'tsvector' => $this->text()->notNull(),
+            'lang' => $this->text(2)->notNull()->defaultValue(Language::ENGLISH),
         ]);
     }
 
