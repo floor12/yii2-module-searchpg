@@ -27,7 +27,10 @@ $form = ActiveForm::begin([
 
 ActiveForm::end();
 
-echo ListView::widget([
-    'dataProvider' => $model->dataProvider(),
-    'itemView' => $this->context
-]);
+if ($model->question)
+    echo ListView::widget([
+        'id' => 'serachResultList',
+        'dataProvider' => $model->dataProvider(),
+        'layout' => '<ol>{items}</ol>{pager}',
+        'itemView' => Yii::$app->getModule('searchpg')->indexItemView
+    ]);

@@ -11,6 +11,10 @@ use yii\web\View;
 ?>
 
 <li>
-    <h2><?= $model->title ?></h2>
-    <a href="<?= $model->url ?>"><?= $model->url ?></a>
+    <h4><?= $model->title_highlighted ?></h4>
+    <p><?= $model->content_highlighted ?></p>
+    <time><?= Yii::$app->formatter->asDatetime($model->updated) ?></time>
+    <a href="<?= Yii::$app->urlManager->createAbsoluteUrl($model->url) ?>">
+        <?= Yii::$app->urlManager->createAbsoluteUrl($model->url) ?>
+    </a>
 </li>

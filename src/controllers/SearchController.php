@@ -23,7 +23,7 @@ class SearchController extends Controller
     /** @inheritDoc */
     public function init()
     {
-        $this->searchModule = $this->getModules()[0]->getModule('searchPg');
+        $this->searchModule = $this->getModules()[0]->getModule('searchpg');
         $this->layout = $this->searchModule->layout;
         $this->indexView = $this->searchModule->indexView;
     }

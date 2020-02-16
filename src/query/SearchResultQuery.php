@@ -3,9 +3,9 @@
 namespace floor12\searchpg\query;
 
 use floor12\searchpg\models\SearchResult;
-use Yii;
 use yii\db\ActiveQuery;
 use yii\db\Exception;
+use yii\db\Expression;
 
 /**
  * @see SearchResult
@@ -19,28 +19,32 @@ class SearchResultQuery extends ActiveQuery
      */
     public function search(string $question)
     {
-        $tsVectoredQuestion = $this->prepareTsVectoredQuestion($question);
-        if (empty($tsVectoredQuestion))
+        if (empty($question))
             return $this->andWhere('1=0');
 
-        return $this->andWhere("tsvector @@ plainto_tsquery('{$tsVectoredQuestion}')");
-    }
+        $tsQuery = new Expression("
+            plainto_tsquery('russian', '{$question}') as qRu,
+            plainto_tsquery('english', '{$question}') as qEn
+        ");
 
-    /**
-     * @param string $question
-     * @return bool|string
-     * @throws Exception
-     */
-    protected function prepareTsVectoredQuestion(string $question)
-    {
-        $tsVectoredQuestion = Yii::$app->db
-            ->createCommand("SELECT to_tsvector('russian','{$question}')")
-            ->queryScalar();
-
-        if (!preg_match_all("/'([^ ]+)'/", $tsVectoredQuestion, $matches))
-            return false;
-
-        return implode(' ', $matches[1]);
+        $highlightedTitleExpression = new Expression("CASE
+           WHEN lang = 'ru' THEN
+               ts_headline('russian', title, qRu)
+           ELSE
+               ts_headline('english', title, qEn) 
+           END as title_highlighted");
+        $highlightedContentExression = new Expression("CASE
+           WHEN lang = 'ru' THEN
+               ts_headline('russian', content, qRu)
+           ELSE
+               ts_headline('english', content, qEn)
+           END as content_highlighted");
+        $orderExpression = new Expression("ts_rank(tsvector, qRu || qEn) DESC");
+        return $this
+            ->select(['*', $highlightedTitleExpression, $highlightedContentExression])
+            ->from(['search_index', $tsQuery])
+            ->andWhere("tsvector @@ (qRu || qEn)")
+            ->orderBy($orderExpression);
     }
 
     /**

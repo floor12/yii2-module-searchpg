@@ -2,9 +2,8 @@
 
 namespace floor12\searchpg\models;
 
-use Yii;
+use floor12\searchpg\query\SearchResultQuery;
 use yii\db\ActiveRecord;
-use yii\db\Exception;
 
 /**
  * This is the model class for table "search_index".
@@ -16,9 +15,18 @@ use yii\db\Exception;
  * @property int $indexed
  * @property int $updated
  * @property string $tsvector
+ * @property string $lang
+ * @property string $language
+ * @property string $title_highlighted
+ * @property string $content_highlighted
  */
 class SearchResult extends ActiveRecord
 {
+
+    public $title_highlighted;
+
+    public $content_highlighted;
+
     /**
      * {@inheritdoc}
      */
@@ -38,24 +46,11 @@ class SearchResult extends ActiveRecord
             [['indexed', 'updated'], 'default', 'value' => null],
             [['indexed', 'updated'], 'integer'],
             [['title', 'url'], 'string', 'max' => 255],
+            [['lang'], 'string', 'max' => 2],
+            [['language'], 'string', 'max' => 48],
         ];
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
-    {
-        return [
-            'id' => 'ID',
-            'title' => 'Title',
-            'content' => 'Content',
-            'url' => 'Url',
-            'indexed' => 'Indexed',
-            'updated' => 'Updated',
-            'tsvector' => 'Tsvector',
-        ];
-    }
+    
 
     /**
      * {@inheritdoc}
@@ -66,20 +61,5 @@ class SearchResult extends ActiveRecord
         return new SearchResultQuery(get_called_class());
     }
 
-    /**
-     * @return bool
-     * @throws Exception
-     */
-    public function beforeValidate()
-    {
-        $this->content = strip_tags($this->content);
-        $this->updated = time();
-        $this->indexed = time();
-        $sql = "SELECT (setweight(to_tsvector('russian', '{$this->title}'),'A') || setweight(to_tsvector('russian', '{$this->content}'), 'B'))";
-        $this->tsvector = Yii::$app
-            ->db
-            ->createCommand($sql)
-            ->queryScalar();
-        return parent::beforeValidate();
-    }
+
 }

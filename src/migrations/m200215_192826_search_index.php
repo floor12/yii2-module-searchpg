@@ -20,8 +20,9 @@ class m200215_192826_search_index extends Migration
             'url' => $this->string()->notNull(),
             'indexed' => $this->integer()->notNull(),
             'updated' => $this->integer()->notNull(),
-            'tsvector' => $this->text()->notNull(),
+            'tsvector' => $this->getDb()->getSchema()->createColumnSchemaBuilder('tsvector')->notNull(),
             'lang' => $this->text(2)->notNull()->defaultValue(Language::ENGLISH),
+            'language' => $this->text(48)->notNull()->defaultValue('english'),
         ]);
     }
 
