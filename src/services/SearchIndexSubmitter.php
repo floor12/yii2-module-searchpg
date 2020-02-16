@@ -27,21 +27,22 @@ class SearchIndexSubmitter
         Language::RUSSIAN => 'russian',
     ];
 
+
     /**
-     * Pass data of indexing page to this constuctor
-     *
+     * SearchIndexSubmitter constructor.
      * @param string $url
      * @param string $title
      * @param string $content
-     * @param string $language
+     * @param string|null $language
      * @param int|null $updated
+     * @throws ErrorException
      */
-    public function __construct(string $url, string $title, string $content, string $language = Language::ENGLISH, int $updated = null)
+    public function __construct(string $url, string $title, string $content, string $language = null, int $updated = null)
     {
         if (!array_key_exists($language, $this->psqlLanguages))
-            throw new ErrorException("Language {$language} cannot be submitet in search index.");
+            throw new ErrorException("Language {$language} cannot be submited in search index.");
 
-        $this->currentPsqlLanguage = $this->psqlLanguages[$language];
+        $this->currentPsqlLanguage = $this->psqlLanguages[$language ?: Language::ENGLISH];
 
         $this->model = SearchResult::findOne(['url' => $url]);
 
@@ -53,7 +54,6 @@ class SearchIndexSubmitter
         $this->model->title = $title;
         $this->model->content = strip_tags($content);
         $this->model->lang = $language;
-        $this->model->language = $this->currentPsqlLanguage;
         $this->model->updated = $updated ?: time();
         $this->model->indexed = time();
     }

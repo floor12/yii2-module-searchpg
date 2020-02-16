@@ -16,7 +16,6 @@ use yii\db\ActiveRecord;
  * @property int $updated
  * @property string $tsvector
  * @property string $lang
- * @property string $language
  * @property string $title_highlighted
  * @property string $content_highlighted
  */
@@ -47,7 +46,6 @@ class SearchResult extends ActiveRecord
             [['indexed', 'updated'], 'integer'],
             [['title', 'url'], 'string', 'max' => 255],
             [['lang'], 'string', 'max' => 2],
-            [['language'], 'string', 'max' => 48],
         ];
     }
     
