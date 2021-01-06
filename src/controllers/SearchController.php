@@ -26,6 +26,7 @@ class SearchController extends Controller
         $this->searchModule = $this->getModules()[0]->getModule('searchpg');
         $this->layout = $this->searchModule->layout;
         $this->indexView = $this->searchModule->indexView;
+        parent::init();
     }
 
     /**
