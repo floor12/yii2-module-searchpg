@@ -81,14 +81,19 @@ class SearchIndexSubmitter
     protected function prepareTsVector()
     {
         $sql = "SELECT (
-            setweight(to_tsvector('{$this->currentPsqlLanguage}', '{$this->model->title}'),'A') || 
-            setweight(to_tsvector('{$this->currentPsqlLanguage}', '{$this->model->content}'), 'B')
+            setweight(to_tsvector('{$this->currentPsqlLanguage}', '{$this->prepareString($this->model->title)}'),'A') || 
+            setweight(to_tsvector('{$this->currentPsqlLanguage}', '{$this->prepareString($this->model->content)}'), 'B')
         )";
 
         $this->model->tsvector = Yii::$app
             ->db
             ->createCommand($sql)
             ->queryScalar();
+    }
+
+    protected function prepareString($string)
+    {
+        return str_replace("'", "''", $string);
     }
 
 }

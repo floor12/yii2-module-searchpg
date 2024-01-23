@@ -29,7 +29,7 @@ ActiveForm::end();
 
 if ($model->question)
     echo ListView::widget([
-        'id' => 'serachResultList',
+        'id' => 'searchResultList',
         'dataProvider' => $model->dataProvider(),
         'layout' => '<ol>{items}</ol>{pager}',
         'itemView' => Yii::$app->getModule('searchpg')->indexItemView
